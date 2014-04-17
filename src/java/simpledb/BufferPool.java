@@ -42,7 +42,7 @@ public class BufferPool {
     }
     
     public static int getPageSize() {
-      return pageSize;
+        return pageSize;
     }
     
     // THIS FUNCTION SHOULD ONLY BE USED FOR TESTING!!
@@ -71,11 +71,9 @@ public class BufferPool {
         int key = pid.hashCode();
         if (pages.containsKey(key))
             return pages.get(key);
-        Page p = Database.getCatalog().getDbFile(pid.getTableId()).readPage(pid);
         if (pages.size() == maxpages)
-        {
-            //delete some random page from hashmap
-        }
+            throw new DbException("not yet implemented!");
+        Page p = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
         pages.put(pid.hashCode(), p);
         return p;
     }
