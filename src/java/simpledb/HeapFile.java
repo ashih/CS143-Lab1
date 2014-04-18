@@ -15,6 +15,10 @@ import java.util.*;
  */
 public class HeapFile implements DbFile {
 
+    protected File f;
+    protected TupleDesc td;
+    protected FileChannel rafch;
+
     /**
      * Constructs a heap file backed by the specified file.
      * 
@@ -24,6 +28,10 @@ public class HeapFile implements DbFile {
      */
     public HeapFile(File f, TupleDesc td) {
         // some code goes here
+        this.f = f;
+        this.td = td;
+        RandomAccessFile raf = new RandomAccessFile(f,"rw");
+        rafch = raf.getChannel();
     }
 
     /**
@@ -33,7 +41,7 @@ public class HeapFile implements DbFile {
      */
     public File getFile() {
         // some code goes here
-        return null;
+        return f;
     }
 
     /**
@@ -47,7 +55,8 @@ public class HeapFile implements DbFile {
      */
     public int getId() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        // throw new UnsupportedOperationException("implement this");
+        return f.getAbsoluteFile().hashCode();
     }
 
     /**
@@ -57,13 +66,19 @@ public class HeapFile implements DbFile {
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        // throw new UnsupportedOperationException("implement this");
+        return td;
     }
 
     // see DbFile.java for javadocs
     public Page readPage(PageId pid) {
         // some code goes here
-        return null;
+        int pageNumber = pid.pageNumber();
+        int offset = BufferPool.PAGE_SIZE * pageNumber;
+        ByteBuffer buff = new ByteBuffer.allocate(BufferPool.PAGE_SIZE); 
+        rafch.read(buff, offset);
+        HeapPageId hpid = (HeapPageId) pid;
+        return new HeapPage(hpid, buff.array());    
     }
 
     // see DbFile.java for javadocs
