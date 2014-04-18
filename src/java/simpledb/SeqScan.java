@@ -43,7 +43,7 @@ public class SeqScan implements DbIterator {
     }
 
     /**
-     * @return
+     * @returnø
      *       return the table name of the table the operator scans. This should
      *       be the actual name of the table in the catalog of the database
      * */
