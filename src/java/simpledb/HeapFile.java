@@ -2,7 +2,6 @@ package simpledb;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
 import java.nio.channels.FileChannel;
 import java.util.*;
 
