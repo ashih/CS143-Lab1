@@ -46,13 +46,14 @@ public class HeapPage implements Page {
 
         // allocate and read the header slots of this page
         header = new byte[getHeaderSize()];
+        //System.out.println(getHeaderSize());
         for (int i=0; i<header.length; i++)
             header[i] = dis.readByte();
         
         tuples = new Tuple[numSlots];
         try{
             // allocate and read the actual records of this page
-            for (int i=0; i<tuples.length; i++)
+            for (int i=0; i<tuples.length; i++)            
                 tuples[i] = readNextTuple(dis,i);
         }catch(NoSuchElementException e){
             e.printStackTrace();
@@ -77,6 +78,7 @@ public class HeapPage implements Page {
      */
     private int getHeaderSize() {        
         // some code goes here
+        //System.out.println((int) Math.ceil(getNumTuples()/8));
         return (int) Math.ceil(getNumTuples()/8);
     }
     
@@ -296,13 +298,20 @@ public class HeapPage implements Page {
     /**
      * Returns true if associated slot on this page is filled.
      */
-    public boolean isSlotUsed(int i) {
+    public boolean isSlotUsed(int i) throws ArrayIndexOutOfBoundsException {
         // some code goes here
+        
         int headerByte = i/8;
         int bit = i%8;
-        byte temp = header[headerByte];
-        int mask = 1 << bit;
-        return (temp & mask) != 0;
+        try {
+            byte temp = header[headerByte];
+            int mask = 1 << bit;
+            return (temp & mask) != 0;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            //System.out.println(header.length);
+            //System.out.println(headerByte);
+            throw e;
+        }
     }
 
     /**

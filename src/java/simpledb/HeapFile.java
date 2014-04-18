@@ -108,8 +108,7 @@ public class HeapFile implements DbFile {
     public int numPages() {
         // some code goes here
         try {
-            int numPages = (int) Math.floor(rafch.size() / BufferPool.PAGE_SIZE);
-            return numPages;
+            return (int) Math.ceil(rafch.size()/BufferPool.PAGE_SIZE);
         } catch (IOException e) {
             System.err.println("IO error when computing number of pages");
             System.exit(1);
@@ -163,7 +162,7 @@ public class HeapFile implements DbFile {
             public boolean hasNext() throws TransactionAbortedException, DbException {
                 if (tIterator == null) return false;
                 if (tIterator.hasNext()) return true;
-                while (currpid <= (numPages-1)) {
+                while (currpid < numPages-1) {
                     currpid++;
                     HeapPageId hpid = new HeapPageId(tableid,currpid);                        currp = (HeapPage) Database.getBufferPool().getPage(tid, hpid, Permissions.READ_ONLY);
                     tIterator = currp.iterator();
@@ -178,9 +177,9 @@ public class HeapFile implements DbFile {
                 return tIterator.next();
             }
 
-            public void rewind() throws DbException, TransactionAbortedException {
-                open();
+            public void rewind() throws DbException, TransactionAbortedException {                
                 close();
+                open();
             }
 
             public void close() {
