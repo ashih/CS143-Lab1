@@ -1,6 +1,7 @@
 package simpledb;
 
 import java.io.*;
+import java.nio.*;
 import java.util.*;
 
 /**
@@ -92,7 +93,8 @@ public class HeapFile implements DbFile {
      */
     public int numPages() {
         // some code goes here
-        return 0;
+        int numPages = (int) Math.floor(rafch.size() / BufferPool.PAGE_SIZE);
+        return numPages;
     }
 
     // see DbFile.java for javadocs
@@ -114,15 +116,58 @@ public class HeapFile implements DbFile {
     // see DbFile.java for javadocs
     public DbFileIterator iterator(TransactionId tid) {
         // some code goes here
+        class HeapFileIterator implements DbFileIterator {
+
+            protected TransactionId tid;
+            protected HeapFile hf;
+            protected int currpid;
+            protected Page currp;
+            protected int numPages;
+            protected Iterator<Tuple> tIterator;
+
+            public HeapFileIterator(TransactionId tid, HeapFile hf) {
+                this.tid = tid;
+                this.hf = hf;
+                currpid = 0;
+                numPages = hf;
+            }
+
+            public void open() {
+                currp = readPage(currpid);
+                tIterator = currp.iterator();
+            }
+
+            public boolean hasNext() {
+                if (tIterator == null) return false;
+                if (tIterator.hasNext()) return true;
+                while (currpid <= (numPages-1)) {
+                    currp = readPage(currpid+1);
+                    tIterator = currp.iterator();
+                    if (tIterator.hasNext()) return true;
+                }
+                return false;
+
+            }
+
+            public Tuple next() {
+                return tIterator.next();
+            }
+
+            public void rewind() throws DbException, TransactionAbortedException {
+                open();
+                close();
+            }
+
+            public void close() {
+                currpid = 0;
+                tIterator = null;
+            }
+        }
         //DbFileIterator it = new HeapFileIterator();
         //return it;
-        return null;
+        HeapFileIterator it = new HeapFileIterator(tid, hf);
+        return it;
     }
-    
-    //class HeapFileIterator implements DbFileIterator {
-        //implement all those functions again
-    
-    //}
 
 }
 
