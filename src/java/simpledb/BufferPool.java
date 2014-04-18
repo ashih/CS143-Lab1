@@ -72,7 +72,7 @@ public class BufferPool {
         if (pages.containsKey(key))
             return pages.get(key);
         if (pages.size() == maxpages)
-            throw new DbException("not yet implemented!");
+            evictPage();
         Page p = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
         pages.put(pid.hashCode(), p);
         return p;
