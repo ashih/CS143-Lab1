@@ -67,7 +67,8 @@ public class HeapPage implements Page {
     */
     private int getNumTuples() {        
         // some code goes here
-        return tuples.length;
+        int tupleSize = td.getSize() * 8 + 1;
+        return BufferPool.PAGE_SIZE * 8 / tupleSize;
     }
 
     /**
@@ -76,7 +77,7 @@ public class HeapPage implements Page {
      */
     private int getHeaderSize() {        
         // some code goes here
-        return header.length;
+        return getNumTuples()/8+1;
     }
     
     /** Return a view of this page before it was modified
@@ -279,14 +280,14 @@ public class HeapPage implements Page {
      */
     public int getNumEmptySlots() {
         // some code goes here
-        int count = 0;
+        int count = getNumTuples();
         for (int i = 0; i < header.length; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 int k = (i*8)+j;
-                if (!isSlotUsed(k))
-                    count++;
+                if (isSlotUsed(k))
+                    count--;
             }
         }
         return count;
@@ -318,7 +319,12 @@ public class HeapPage implements Page {
      */
     public Iterator<Tuple> iterator() {
         // some code goes here
-        class HeapPageIterator implements Iterator<Tuple> {
+        
+        
+        return new HeapPageIterator(this); //did in discussion
+    }
+
+    class HeapPageIterator implements Iterator<Tuple> {
             private HeapPage p;
             private int numUsed;
             private int curr;
@@ -344,8 +350,5 @@ public class HeapPage implements Page {
                 return;
             }
         }
-        
-        return new HeapPageIterator(this); //did in discussion
-    }
 }
 
