@@ -1,7 +1,9 @@
 package simpledb;
 
 import java.io.*;
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.FileChannel;
 import java.util.*;
 
 /**
@@ -29,10 +31,15 @@ public class HeapFile implements DbFile {
      */
     public HeapFile(File f, TupleDesc td) {
         // some code goes here
-        this.f = f;
-        this.td = td;
-        RandomAccessFile raf = new RandomAccessFile(f,"rw");
-        rafch = raf.getChannel();
+        try {
+            this.f = f;
+            this.td = td;
+            RandomAccessFile raf = new RandomAccessFile(f,"rw");
+            rafch = raf.getChannel();
+        } catch (FileNotFoundException e) {
+            System.err.println("file not found");
+            System.exit(1);
+        }
     }
 
     /**
@@ -74,12 +81,19 @@ public class HeapFile implements DbFile {
     // see DbFile.java for javadocs
     public Page readPage(PageId pid) {
         // some code goes here
-        int pageNumber = pid.pageNumber();
-        int offset = BufferPool.PAGE_SIZE * pageNumber;
-        ByteBuffer buff = new ByteBuffer.allocate(BufferPool.PAGE_SIZE); 
-        rafch.read(buff, offset);
-        HeapPageId hpid = (HeapPageId) pid;
-        return new HeapPage(hpid, buff.array());    
+        try { 
+            int pageNumber = pid.pageNumber();
+            int offset = BufferPool.PAGE_SIZE * pageNumber;
+            ByteBuffer buff = ByteBuffer.allocate(BufferPool.PAGE_SIZE); 
+            rafch.read(buff, offset);
+            HeapPageId hpid = (HeapPageId) pid;
+            return new HeapPage(hpid, buff.array());
+        } catch (IOException e) {
+            System.err.println("IO error when reading page");
+            System.exit(1);
+            return null;
+        }
+
     }
 
     // see DbFile.java for javadocs
@@ -93,8 +107,14 @@ public class HeapFile implements DbFile {
      */
     public int numPages() {
         // some code goes here
-        int numPages = (int) Math.floor(rafch.size() / BufferPool.PAGE_SIZE);
-        return numPages;
+        try {
+            int numPages = (int) Math.floor(rafch.size() / BufferPool.PAGE_SIZE);
+            return numPages;
+        } catch (IOException e) {
+            System.err.println("IO error when computing number of pages");
+            System.exit(1);
+            return -1;
+        }
     }
 
     // see DbFile.java for javadocs
@@ -120,6 +140,7 @@ public class HeapFile implements DbFile {
 
             protected TransactionId tid;
             protected HeapFile hf;
+            protected int tableid;
             protected int currpid;
             protected Page currp;
             protected int numPages;
@@ -128,21 +149,25 @@ public class HeapFile implements DbFile {
             public HeapFileIterator(TransactionId tid, HeapFile hf) {
                 this.tid = tid;
                 this.hf = hf;
+                tableid = hf.getId();
                 currpid = 0;
-                numPages = hf;
+                numPages = hf.numPages();
             }
 
             public void open() {
-                currp = readPage(currpid);
-                tIterator = currp.iterator();
+                HeapPageId hpid = new HeapPageId(tableid,currpid);
+                currp = readPage(hpid);
+                tIterator = ((HeapPage) currp).iterator();
             }
 
             public boolean hasNext() {
                 if (tIterator == null) return false;
                 if (tIterator.hasNext()) return true;
                 while (currpid <= (numPages-1)) {
-                    currp = readPage(currpid+1);
-                    tIterator = currp.iterator();
+                    currpid++;
+                    HeapPageId hpid = new HeapPageId(tableid,currpid);
+                    currp = readPage(hpid);
+                    tIterator = ((HeapPage) currp).iterator();
                     if (tIterator.hasNext()) return true;
                 }
                 return false;
@@ -150,6 +175,8 @@ public class HeapFile implements DbFile {
             }
 
             public Tuple next() {
+                if (tIterator == null)
+                    throw new NoSuchElementException();
                 return tIterator.next();
             }
 
@@ -165,7 +192,7 @@ public class HeapFile implements DbFile {
         }
         //DbFileIterator it = new HeapFileIterator();
         //return it;
-        HeapFileIterator it = new HeapFileIterator(tid, hf);
+        HeapFileIterator it = new HeapFileIterator(tid, this);
         return it;
     }
 
