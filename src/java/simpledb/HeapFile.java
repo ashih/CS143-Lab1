@@ -142,7 +142,7 @@ public class HeapFile implements DbFile {
             protected HeapFile hf;
             protected int tableid;
             protected int currpid;
-            protected Page currp;
+            protected HeapPage currp;
             protected int numPages;
             protected Iterator<Tuple> tIterator;
 
@@ -156,8 +156,8 @@ public class HeapFile implements DbFile {
 
             public void open() {
                 HeapPageId hpid = new HeapPageId(tableid,currpid);
-                currp = readPage(hpid);
-                tIterator = ((HeapPage) currp).iterator();
+                currp = (HeapPage) Database.getBufferPool().getPage(tableid, currpid, Permissions.READ_ONLY);
+                tIterator = currp.iterator();
             }
 
             public boolean hasNext() {
@@ -166,8 +166,8 @@ public class HeapFile implements DbFile {
                 while (currpid <= (numPages-1)) {
                     currpid++;
                     HeapPageId hpid = new HeapPageId(tableid,currpid);
-                    currp = readPage(hpid);
-                    tIterator = ((HeapPage) currp).iterator();
+                    currp = (HeapPage) Database.getBufferPool().getPage(tableid, currpid, Permissions.READ_ONLY);
+                    tIterator = currp.iterator();
                     if (tIterator.hasNext()) return true;
                 }
                 return false;
