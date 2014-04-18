@@ -79,7 +79,7 @@ public class HeapPage implements Page {
     private int getHeaderSize() {        
         // some code goes here
         //System.out.println((int) Math.ceil(getNumTuples()/8));
-        return (int) Math.ceil(getNumTuples()/8);
+        return (int) Math.ceil(getNumTuples()/8.0);
     }
     
     /** Return a view of this page before it was modified

@@ -108,7 +108,7 @@ public class HeapFile implements DbFile {
     public int numPages() {
         // some code goes here
         try {
-            return (int) Math.ceil(rafch.size()/BufferPool.PAGE_SIZE);
+            return (int) Math.ceil( (double) (rafch.size()/BufferPool.PAGE_SIZE));
         } catch (IOException e) {
             System.err.println("IO error when computing number of pages");
             System.exit(1);
