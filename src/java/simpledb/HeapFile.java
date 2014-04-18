@@ -154,24 +154,22 @@ public class HeapFile implements DbFile {
                 numPages = hf.numPages();
             }
 
-            public void open() {
+            public void open() throws TransactionAbortedException, DbException {                
                 HeapPageId hpid = new HeapPageId(tableid,currpid);
-                currp = (HeapPage) Database.getBufferPool().getPage(tableid, currpid, Permissions.READ_ONLY);
+                currp = (HeapPage) Database.getBufferPool().getPage(tid, hpid, Permissions.READ_ONLY);
                 tIterator = currp.iterator();
             }
 
-            public boolean hasNext() {
+            public boolean hasNext() throws TransactionAbortedException, DbException {
                 if (tIterator == null) return false;
                 if (tIterator.hasNext()) return true;
                 while (currpid <= (numPages-1)) {
                     currpid++;
-                    HeapPageId hpid = new HeapPageId(tableid,currpid);
-                    currp = (HeapPage) Database.getBufferPool().getPage(tableid, currpid, Permissions.READ_ONLY);
+                    HeapPageId hpid = new HeapPageId(tableid,currpid);                        currp = (HeapPage) Database.getBufferPool().getPage(tid, hpid, Permissions.READ_ONLY);
                     tIterator = currp.iterator();
                     if (tIterator.hasNext()) return true;
-                }
+                }                
                 return false;
-
             }
 
             public Tuple next() {
