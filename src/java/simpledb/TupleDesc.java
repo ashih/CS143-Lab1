@@ -138,7 +138,7 @@ public class TupleDesc implements Serializable {
         // some code goes here
         try {
             for (int i = 0; i < items.size(); i++)
-                if (items.elementAt(i).fieldName.equals(name)) //account for null strings
+                if ((items.elementAt(i).fieldName != null) && (items.elementAt(i).fieldName.equals(name))) //account for null strings
                     return i;
             throw new NoSuchElementException();
         } catch (NullPointerException e) {
