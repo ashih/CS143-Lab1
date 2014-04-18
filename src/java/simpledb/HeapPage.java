@@ -320,11 +320,7 @@ public class HeapPage implements Page {
     public Iterator<Tuple> iterator() {
         // some code goes here
         
-        
-        return new HeapPageIterator(this); //did in discussion
-    }
-
-    class HeapPageIterator implements Iterator<Tuple> {
+        class HeapPageIterator implements Iterator<Tuple> {
             private HeapPage p;
             private int numUsed;
             private int curr;
@@ -350,5 +346,10 @@ public class HeapPage implements Page {
                 return;
             }
         }
+        
+        return new HeapPageIterator(this); //did in discussion
+    }
+
+    
 }
 
