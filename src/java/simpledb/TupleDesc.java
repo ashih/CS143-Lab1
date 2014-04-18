@@ -35,7 +35,7 @@ public class TupleDesc implements Serializable {
         }
     }
 
-    public Vector<TDItem> items;
+    public Vector<TDItem> m_items;
 
     /**
      * @return
@@ -44,7 +44,7 @@ public class TupleDesc implements Serializable {
      * */
     public Iterator<TDItem> iterator() {
         // some code goes here
-        return items.iterator();
+        return m_items.iterator();
     }
 
     private static final long serialVersionUID = 1L;
@@ -63,9 +63,9 @@ public class TupleDesc implements Serializable {
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
         // some code goes here
         int len = typeAr.length;
-        items = new Vector<TDItem>(len);
+        m_items = new Vector<TDItem>(len);
         for (int i = 0; i < len; i++)
-            items.add(i, new TDItem(typeAr[i],fieldAr[i]));
+            m_items.add(i, new TDItem(typeAr[i],fieldAr[i]));
     }
 
     /**
@@ -79,9 +79,9 @@ public class TupleDesc implements Serializable {
     public TupleDesc(Type[] typeAr) {
         // some code goes here
         int len = typeAr.length;
-        items = new Vector<TDItem>(len);
+        m_items = new Vector<TDItem>(len);
         for (int i = 0; i < len; i++)
-            items.add(i, new TDItem(typeAr[i],null));
+            m_items.add(i, new TDItem(typeAr[i],null));
     }
 
     /**
@@ -89,7 +89,7 @@ public class TupleDesc implements Serializable {
      */
     public int numFields() {
         // some code goes here
-        return items.size();
+        return m_items.size();
     }
 
     /**
@@ -103,9 +103,9 @@ public class TupleDesc implements Serializable {
      */
     public String getFieldName(int i) throws NoSuchElementException {
         // some code goes here
-        if (i < 0 || i >= items.size())
+        if (i < 0 || i >= m_items.size())
             throw new NoSuchElementException();
-        return items.elementAt(i).fieldName;
+        return m_items.elementAt(i).fieldName;
     }
 
     /**
@@ -120,9 +120,9 @@ public class TupleDesc implements Serializable {
      */
     public Type getFieldType(int i) throws NoSuchElementException {
         // some code goes here
-        if (i < 0 || i >= items.size())
+        if (i < 0 || i >= m_items.size())
             throw new NoSuchElementException();
-        return items.elementAt(i).fieldType;
+        return m_items.elementAt(i).fieldType;
     }
 
     /**
@@ -137,8 +137,8 @@ public class TupleDesc implements Serializable {
     public int fieldNameToIndex(String name) throws NoSuchElementException {
         // some code goes here
         try {
-            for (int i = 0; i < items.size(); i++)
-                if ((items.elementAt(i).fieldName != null) && (items.elementAt(i).fieldName.equals(name))) //account for null strings
+            for (int i = 0; i < m_items.size(); i++)
+                if ((m_items.elementAt(i).fieldName != null) && (m_items.elementAt(i).fieldName.equals(name))) //account for null strings
                     return i;
             throw new NoSuchElementException();
         } catch (NullPointerException e) {
@@ -154,8 +154,8 @@ public class TupleDesc implements Serializable {
     public int getSize() {
         // some code goes here
         int acc = 0;
-        for (int i = 0; i < items.size(); i++)
-            acc += items.elementAt(i).fieldType.getLen();
+        for (int i = 0; i < m_items.size(); i++)
+            acc += m_items.elementAt(i).fieldType.getLen();
         return acc;
     }
 
@@ -175,8 +175,8 @@ public class TupleDesc implements Serializable {
         Type[] t1 = new Type[0];
         String[] t2 = new String[0];
         TupleDesc tdret = new TupleDesc(t1,t2);
-        tdret.items.addAll(td1.items);
-        tdret.items.addAll(td2.items);
+        tdret.m_items.addAll(td1.m_items);
+        tdret.m_items.addAll(td2.m_items);
         return tdret;
     }
 
@@ -192,9 +192,9 @@ public class TupleDesc implements Serializable {
     public boolean equals(Object o) {
         // some code goes here
         if (o instanceof TupleDesc) {
-            if (((TupleDesc) o).items.size() != items.size()) return false;
-            for (int i = 0; i < items.size(); i++)
-                if (((TupleDesc) o).items.elementAt(i).fieldType != items.elementAt(i).fieldType)
+            if (((TupleDesc) o).m_items.size() != m_items.size()) return false;
+            for (int i = 0; i < m_items.size(); i++)
+                if (((TupleDesc) o).m_items.elementAt(i).fieldType != m_items.elementAt(i).fieldType)
                     return false;
             return true;
         } 
@@ -217,8 +217,8 @@ public class TupleDesc implements Serializable {
     public String toString() {
         // some code goes here
         String ret = "";
-        for (int i = 0; i < items.size(); i++)
-            ret += items.elementAt(i).toString();
+        for (int i = 0; i < m_items.size(); i++)
+            ret += m_items.elementAt(i).toString();
         return ret;
     }
 }

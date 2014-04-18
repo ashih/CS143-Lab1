@@ -7,22 +7,22 @@ public class HeapPageId implements PageId {
      * Constructor. Create a page id structure for a specific page of a
      * specific table.
      *
-     * @param tableId The table that is being referenced
+     * @param m_tableid The table that is being referenced
      * @param pgNo The page number in that table.
      */
-    private int tableId;
-    private int pageNumber;
+    private int m_tableid;
+    private int m_pageNumber;
 
-    public HeapPageId(int tableId, int pgNo) {
+    public HeapPageId(int tableid, int pgNo) {
         // some code goes here
-        this.tableId = tableId;
-        pageNumber = pgNo;
+        this.m_tableid = tableid;
+        m_pageNumber = pgNo;
     }
 
     /** @return the table associated with this PageId */
     public int getTableId() {
         // some code goes here
-        return tableId;
+        return m_tableid;
     }
 
     /**
@@ -31,7 +31,7 @@ public class HeapPageId implements PageId {
      */
     public int pageNumber() {
         // some code goes here
-        return pageNumber;
+        return m_pageNumber;
     }
 
     /**
@@ -42,11 +42,11 @@ public class HeapPageId implements PageId {
      */
     public int hashCode() {
         // some code goes here
-        int temp = pageNumber;
+        int temp = m_pageNumber;
         int multiplier;
         for (multiplier = 1; temp >= 10; temp /= 10)
             multiplier++;
-        return tableId * 10^multiplier + pageNumber;
+        return m_tableid * 10^multiplier + m_pageNumber;
     }
 
     /**

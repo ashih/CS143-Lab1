@@ -13,9 +13,9 @@ public class Tuple implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private TupleDesc td; 
-    private RecordId rid;
-    private Field [] fields;//I put this here
+    private TupleDesc m_td; 
+    private RecordId m_rid;
+    private Field [] m_fields;//I put this here
 
     /**
      * Create a new tuple with the specified schema (type).
@@ -26,9 +26,9 @@ public class Tuple implements Serializable {
      */
     public Tuple(TupleDesc td) {
         // some code goes here
-        this.td = td;
-        rid = null;
-        fields = new Field[100];
+        this.m_td = td;
+        m_rid = null;
+        m_fields = new Field[100];
     }
 
     /**
@@ -36,7 +36,7 @@ public class Tuple implements Serializable {
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return td;
+        return m_td;
     }
 
     /**
@@ -45,7 +45,7 @@ public class Tuple implements Serializable {
      */
     public RecordId getRecordId() {
         // some code goes here
-        return rid;
+        return m_rid;
     }
 
     /**
@@ -55,7 +55,7 @@ public class Tuple implements Serializable {
      *            the new RecordId for this tuple.
      */
     public void setRecordId(RecordId rid) {
-        this.rid = rid;
+        this.m_rid = rid;
     }
 
     /**
@@ -70,7 +70,7 @@ public class Tuple implements Serializable {
 
     public void setField(int i, Field f) {
         // some code goes here
-        fields[i] = f;
+        m_fields[i] = f;
     }
 
     /**
@@ -81,7 +81,7 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        return fields[i];
+        return m_fields[i];
     }
 
     /**
@@ -95,19 +95,19 @@ public class Tuple implements Serializable {
     public String toString() {
         // some code goes here
         String s = "";
-        for (int i = 0; i < td.numFields(); i++)
-            s += td.items.elementAt(i).fieldName + "\t";
+        for (int i = 0; i < m_td.numFields(); i++)
+            s += m_td.m_items.elementAt(i).fieldName + "\t";
         return s + "\n";
     }
     
     /**
      * @return
-     *        An iterator which iterates over all the fields of this tuple
+     *        An iterator which iterates over all the m_fields of this tuple
      * */
-    public Iterator<Field> fields()
+    public Iterator<Field> m_fields()
     {
         // some code goes here
-        return Arrays.asList(fields).iterator();
+        return Arrays.asList(m_fields).iterator();
     }
     
     /**
@@ -116,6 +116,6 @@ public class Tuple implements Serializable {
     public void resetTupleDesc(TupleDesc td)
     {
         // some code goes here
-        this.td = td;
+        this.m_td = td;
     }
 }

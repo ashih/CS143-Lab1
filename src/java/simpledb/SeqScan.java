@@ -21,25 +21,25 @@ public class SeqScan implements DbIterator {
      *            the table to scan.
      * @param tableAlias
      *            the alias of this table (needed by the parser); the returned
-     *            tupleDesc should have fields with name tableAlias.fieldName
+     *            tupleDesc should have fields with name m_tableAlias.fieldName
      *            (note: this class is not responsible for handling a case where
-     *            tableAlias or fieldName are null. It shouldn't crash if they
+     *            m_tableAlias or fieldName are null. It shouldn't crash if they
      *            are, but the resulting name can be null.fieldName,
-     *            tableAlias.null, or null.null).
+     *            m_tableAlias.null, or null.null).
      */
-    private TransactionId tid;
-    private int tableid;
-    private String tableAlias;
-    private DbFileIterator iter;
-    private DbFile file;
+    private TransactionId m_tid;
+    private int m_tableid;
+    private String m_tableAlias;
+    private DbFileIterator m_iter;
+    private DbFile m_file;
 
     public SeqScan(TransactionId tid, int tableid, String tableAlias) {
         // some code goes here
-        this.tid = tid;
-        this.tableid = tableid;
-        this.tableAlias = tableAlias;
-        file = Database.getCatalog().getDatabaseFile(tableid);
-        iter = file.iterator(tid);
+        this.m_tid = tid;
+        this.m_tableid = tableid;
+        this.m_tableAlias = tableAlias;
+        m_file = Database.getCatalog().getDatabaseFile(m_tableid);
+        m_iter = m_file.iterator(m_tid);
     }
 
     /**
@@ -48,7 +48,7 @@ public class SeqScan implements DbIterator {
      *       be the actual name of the table in the catalog of the database
      * */
     public String getTableName() {
-        return Database.getCatalog().getTableName(tableid);
+        return Database.getCatalog().getTableName(m_tableid);
     }
     
     /**
@@ -57,27 +57,27 @@ public class SeqScan implements DbIterator {
     public String getAlias()
     {
         // some code goes here
-        return tableAlias;
+        return m_tableAlias;
     }
 
     /**
-     * Reset the tableid, and tableAlias of this operator.
-     * @param tableid
+     * Reset the m_tableid, and m_tableAlias of this operator.
+     * @param m_tableid
      *            the table to scan.
-     * @param tableAlias
+     * @param m_tableAlias
      *            the alias of this table (needed by the parser); the returned
-     *            tupleDesc should have fields with name tableAlias.fieldName
+     *            tupleDesc should have fields with name m_tableAlias.fieldName
      *            (note: this class is not responsible for handling a case where
-     *            tableAlias or fieldName are null. It shouldn't crash if they
+     *            m_tableAlias or fieldName are null. It shouldn't crash if they
      *            are, but the resulting name can be null.fieldName,
-     *            tableAlias.null, or null.null).
+     *            m_tableAlias.null, or null.null).
      */
     public void reset(int tableid, String tableAlias) {
         // some code goes here
-        this.tableid = tableid;
-        this.tableAlias = tableAlias;
-        file = Database.getCatalog().getDatabaseFile(tableid);
-        iter = file.iterator(tid);
+        this.m_tableid = tableid;
+        this.m_tableAlias = tableAlias;
+        m_file = Database.getCatalog().getDatabaseFile(tableid);
+        m_iter = m_file.iterator(m_tid);
     }
 
     public SeqScan(TransactionId tid, int tableid) {
@@ -86,51 +86,51 @@ public class SeqScan implements DbIterator {
 
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
-        iter.open();
+        m_iter.open();
     }
 
     /**
      * Returns the TupleDesc with field names from the underlying HeapFile,
-     * prefixed with the tableAlias string from the constructor. This prefix
+     * prefixed with the m_tableAlias string from the constructor. This prefix
      * becomes useful when joining tables containing a field(s) with the same
      * name.
      * 
      * @return the TupleDesc with field names from the underlying HeapFile,
-     *         prefixed with the tableAlias string from the constructor.
+     *         prefixed with the m_tableAlias string from the constructor.
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        TupleDesc temp = file.getTupleDesc();
+        TupleDesc temp = m_file.getTupleDesc();
         int len = temp.numFields();
         Type[] types = new Type[len];
         String[] names = new String[len];
         for (int i = 0; i < len; i++)
         {
             types[i] = temp.getFieldType(i);
-            names[i] = tableAlias + "," + temp.getFieldName(i);
+            names[i] = m_tableAlias + "," + temp.getFieldName(i);
         }
         return new TupleDesc(types,names);
     }
 
     public boolean hasNext() throws TransactionAbortedException, DbException {
         // some code goes here
-        return iter.hasNext();
+        return m_iter.hasNext();
     }
 
     public Tuple next() throws NoSuchElementException,
             TransactionAbortedException, DbException {
         // some code goes here
-        return iter.next();
+        return m_iter.next();
     }
 
     public void close() {
         // some code goes here
-        iter.close();
+        m_iter.close();
     }
 
     public void rewind() throws DbException, NoSuchElementException,
             TransactionAbortedException {
         // some code goes here
-        iter.rewind();
+        m_iter.rewind();
     }
 }
