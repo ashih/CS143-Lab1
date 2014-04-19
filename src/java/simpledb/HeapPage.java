@@ -358,7 +358,5 @@ public class HeapPage implements Page {
         
         return new HeapPageIterator(this); //did in discussion
     }
-
-    
 }
 

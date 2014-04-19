@@ -125,45 +125,45 @@ public class HeapFile implements DbFile {
         // some code goes here
         class HeapFileIterator implements DbFileIterator {
 
-            protected TransactionId tid;
-            protected HeapFile hf;
-            protected int tableid;
-            protected int currpid;
-            protected HeapPage currp;
-            protected int numPages;
-            protected Iterator<Tuple> tIterator;
+            protected TransactionId m_tid;
+            protected HeapFile m_hf;
+            protected int m_tableid;
+            protected int m_currpid;
+            protected HeapPage m_currp;
+            protected int m_numPages;
+            protected Iterator<Tuple> m_it;
 
             public HeapFileIterator(TransactionId tid, HeapFile hf) {
-                this.tid = tid;
-                this.hf = hf;
-                tableid = hf.getId();
-                currpid = 0;
-                numPages = hf.numPages();
+                m_tid = tid;
+                m_hf = hf;
+                m_tableid = hf.getId();
+                m_currpid = 0;
+                m_numPages = hf.numPages();
             }
 
             public void open() throws TransactionAbortedException, DbException {                
-                HeapPageId hpid = new HeapPageId(tableid,currpid);
-                currp = (HeapPage) Database.getBufferPool().getPage(tid, hpid, Permissions.READ_ONLY);
-                tIterator = currp.iterator();
+                HeapPageId hpid = new HeapPageId(m_tableid,m_currpid);
+                m_currp = (HeapPage) Database.getBufferPool().getPage(m_tid, hpid, Permissions.READ_ONLY);
+                m_it = m_currp.iterator();
             }
 
             public boolean hasNext() throws TransactionAbortedException, DbException {
-                if (tIterator == null) return false;
-                if (tIterator.hasNext()) return true;
-                while (currpid < numPages-1) {
-                    currpid++;
-                    HeapPageId hpid = new HeapPageId(tableid,currpid);
-                    currp = (HeapPage) Database.getBufferPool().getPage(tid, hpid, Permissions.READ_ONLY);
-                    tIterator = currp.iterator();
-                    if (tIterator.hasNext()) return true;
+                if (m_it == null) return false;
+                if (m_it.hasNext()) return true;
+                while (m_currpid < m_numPages-1) {
+                    m_currpid++;
+                    HeapPageId hpid = new HeapPageId(m_tableid,m_currpid);
+                    m_currp = (HeapPage) Database.getBufferPool().getPage(m_tid, hpid, Permissions.READ_ONLY);
+                    m_it = m_currp.iterator();
+                    if (m_it.hasNext()) return true;
                 }                
                 return false;
             }
 
             public Tuple next() {
-                if (tIterator == null)
+                if (m_it == null)
                     throw new NoSuchElementException();
-                return tIterator.next();
+                return m_it.next();
             }
 
             public void rewind() throws DbException, TransactionAbortedException {                
@@ -172,8 +172,8 @@ public class HeapFile implements DbFile {
             }
 
             public void close() {
-                currpid = 0;
-                tIterator = null;
+                m_currpid = 0;
+                m_it = null;
             }
         }
         //DbFileIterator it = new HeapFileIterator();
