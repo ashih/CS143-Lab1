@@ -160,9 +160,10 @@ public class HeapFile implements DbFile {
                 return false;
             }
 
-            public Tuple next() {
+            public Tuple next() throws TransactionAbortedException, DbException {
                 if (m_it == null)
                     throw new NoSuchElementException();
+                hasNext();
                 return m_it.next();
             }
 

@@ -78,7 +78,6 @@ public class HeapPage implements Page {
      */
     private int getHeaderSize() {        
         // some code goes here
-        //System.out.println((int) Math.ceil(getNumTuples()/8));
         return (int) Math.ceil(getNumTuples()/8.0);
     }
     
@@ -299,19 +298,12 @@ public class HeapPage implements Page {
      * Returns true if associated slot on this page is filled.
      */
     public boolean isSlotUsed(int i) throws ArrayIndexOutOfBoundsException {
-        // some code goes here
-        
+        // some code goes here        
         int headerByte = i/8;
         int bit = i%8;
-        try {
-            byte temp = header[headerByte];
-            int mask = 1 << bit;
-            return (temp & mask) != 0;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //System.out.println(header.length);
-            //System.out.println(headerByte);
-            throw e;
-        }
+        byte temp = header[headerByte];
+        int mask = 1 << bit;
+        return (temp & mask) != 0;        
     }
 
     /**
