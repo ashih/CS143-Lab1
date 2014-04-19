@@ -31,15 +31,15 @@ public class SeqScan implements DbIterator {
     private int m_tableid;
     private String m_tableAlias;
     private DbFileIterator m_iter;
-    private DbFile m_file;
+    private DbFile m_f;
 
     public SeqScan(TransactionId tid, int tableid, String tableAlias) {
         // some code goes here
-        this.m_tid = tid;
-        this.m_tableid = tableid;
-        this.m_tableAlias = tableAlias;
-        m_file = Database.getCatalog().getDatabaseFile(m_tableid);
-        m_iter = m_file.iterator(m_tid);
+        m_tid = tid;
+        m_tableid = tableid;
+        m_tableAlias = tableAlias;
+        m_f = Database.getCatalog().getDatabaseFile(m_tableid);
+        m_iter = m_f.iterator(m_tid);
     }
 
     /**
@@ -76,8 +76,8 @@ public class SeqScan implements DbIterator {
         // some code goes here
         this.m_tableid = tableid;
         this.m_tableAlias = tableAlias;
-        m_file = Database.getCatalog().getDatabaseFile(tableid);
-        m_iter = m_file.iterator(m_tid);
+        m_f = Database.getCatalog().getDatabaseFile(tableid);
+        m_iter = m_f.iterator(m_tid);
     }
 
     public SeqScan(TransactionId tid, int tableid) {
@@ -100,7 +100,7 @@ public class SeqScan implements DbIterator {
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        TupleDesc temp = m_file.getTupleDesc();
+        TupleDesc temp = m_f.getTupleDesc();
         int len = temp.numFields();
         Type[] types = new Type[len];
         String[] names = new String[len];
