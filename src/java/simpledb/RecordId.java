@@ -20,13 +20,13 @@ public class RecordId implements Serializable {
      *            the tuple number within the page.
      */
 
-    private PageId pageId;
-    private int tupleNumber;
+    private PageId m_pageid;
+    private int m_tupleNumber;
 
     public RecordId(PageId pid, int tupleno) {
         // some code goes here
-        pageId = pid;
-        tupleNumber = tupleno;
+        m_pageid = pid;
+        m_tupleNumber = tupleno;
     }
 
     /**
@@ -34,7 +34,7 @@ public class RecordId implements Serializable {
      */
     public int tupleno() {
         // some code goes here
-        return tupleNumber;
+        return m_tupleNumber;
     }
 
     /**
@@ -42,7 +42,7 @@ public class RecordId implements Serializable {
      */
     public PageId getPageId() {
         // some code goes here
-        return pageId;
+        return m_pageid;
     }
 
     /**
@@ -68,7 +68,7 @@ public class RecordId implements Serializable {
     @Override
     public int hashCode() {
         // some code goes here
-        return tupleNumber + pageId.hashCode();
+        return m_tupleNumber + m_pageid.hashCode();
     }
 
 }
