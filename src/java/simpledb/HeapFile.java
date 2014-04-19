@@ -19,7 +19,6 @@ public class HeapFile implements DbFile {
 
     protected File f;
     protected TupleDesc td;
-    protected FileChannel rafch;
 
     /**
      * Constructs a heap file backed by the specified file.
@@ -30,15 +29,8 @@ public class HeapFile implements DbFile {
      */
     public HeapFile(File f, TupleDesc td) {
         // some code goes here
-        try {
-            this.f = f;
-            this.td = td;
-            RandomAccessFile raf = new RandomAccessFile(f,"rw");
-            rafch = raf.getChannel();
-        } catch (FileNotFoundException e) {
-            System.err.println("file not found");
-            System.exit(1);
-        }
+        this.f = f;
+        this.td = td;
     }
 
     /**
@@ -81,18 +73,19 @@ public class HeapFile implements DbFile {
     public Page readPage(PageId pid) {
         // some code goes here
         try { 
-            int pageNumber = pid.pageNumber();
-            int offset = BufferPool.PAGE_SIZE * pageNumber;
-            ByteBuffer buff = ByteBuffer.allocate(BufferPool.PAGE_SIZE); 
-            rafch.read(buff, offset);
+            RandomAccessFile raf = new RandomAccessFile(f,"r");
+            byte[] buffer = new byte[BufferPool.PAGE_SIZE];
+            int offset = BufferPool.PAGE_SIZE * pid.pageNumber();
+            raf.seek(offset);
+            raf.read(buffer, 0, BufferPool.PAGE_SIZE);
+            raf.close();
             HeapPageId hpid = (HeapPageId) pid;
-            return new HeapPage(hpid, buff.array());
+            return new HeapPage(hpid, buffer);
         } catch (IOException e) {
             System.err.println("IO error when reading page");
             System.exit(1);
             return null;
         }
-
     }
 
     // see DbFile.java for javadocs
@@ -106,13 +99,7 @@ public class HeapFile implements DbFile {
      */
     public int numPages() {
         // some code goes here
-        try {
-            return (int) Math.ceil( (double) (rafch.size()/BufferPool.PAGE_SIZE));
-        } catch (IOException e) {
-            System.err.println("IO error when computing number of pages");
-            System.exit(1);
-            return -1;
-        }
+        return (int) Math.ceil( (double) (f.length()/BufferPool.PAGE_SIZE));
     }
 
     // see DbFile.java for javadocs
