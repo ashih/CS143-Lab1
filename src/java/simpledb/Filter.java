@@ -18,6 +18,8 @@ public class Filter extends Operator {
      * @param child
      *            The child operator
      */
+    
+    
     public Filter(Predicate p, DbIterator child) {
         // some code goes here
     }
