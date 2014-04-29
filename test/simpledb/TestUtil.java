@@ -143,7 +143,15 @@ public class TestUtil {
                 }
             }
 
+            
+
             if (!matched) {
+                // delete this later
+                //System.out.println("This was expected");
+                //for (int i = 0; i < expectedTup.getTupleDesc().numFields(); i++) 
+                //    System.out.print(expectedTup.getField(i));
+                //System.out.println();
+                // delete this later ^^
                 throw new RuntimeException("expected tuple not found: " + expectedTup);
             }
         }

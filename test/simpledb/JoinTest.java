@@ -90,6 +90,15 @@ public class JoinTest extends SimpleDbTestBase {
     JoinPredicate pred = new JoinPredicate(0, Predicate.Op.GREATER_THAN, 0);
     Join op = new Join(pred, scan1, scan2);
     op.open();
+    //-
+    //while (op.hasNext()) {
+    //  Tuple next = op.next();
+    //  for (int i = 0; i < next.getTupleDesc().numFields(); i++) 
+    //    System.out.print(next.getField(i));
+    //  System.out.println();
+    //}
+    //op.rewind();
+    //-
     gtJoin.open();
     TestUtil.matchAllTuples(gtJoin, op);
   }
