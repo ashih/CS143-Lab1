@@ -54,10 +54,6 @@ public class IntegerAggregator implements Aggregator {
      *            the Tuple containing an aggregate field and a group-by field
      */
     public void mergeTupleIntoGroup(Tuple tup) {
-<<<<<<< HEAD
-        // some code goes here
-        
-=======
         // some code goes here 
         if (m_keyName == null)
             m_keyName = tup.getTupleDesc().getFieldName(m_gbfield);
@@ -117,7 +113,6 @@ public class IntegerAggregator implements Aggregator {
             m_aggregate.put(key,aggregate);
             m_count.put(key,count);
         }        
->>>>>>> 828ee70708fb635586a091033548e413a6a33c6c
     }
 
     /**
