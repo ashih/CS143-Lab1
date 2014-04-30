@@ -29,8 +29,15 @@ public class Aggregate extends Operator {
      * @param aop
      *            The aggregation operator to use
      */
+
+    DbIterator m_child;
+    int m_afield;
+    int m_gfield;
+    Aggregator.Op m_aop;
+
     public Aggregate(DbIterator child, int afield, int gfield, Aggregator.Op aop) {
 	// some code goes here
+        
     }
 
     /**

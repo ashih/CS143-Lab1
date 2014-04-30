@@ -2,6 +2,7 @@ package simpledb;
 
 import java.io.Serializable;
 import java.util.Arrays;
+
 import java.util.Iterator;
 
 /**
@@ -16,6 +17,7 @@ public class Tuple implements Serializable {
     private TupleDesc m_td; 
     private RecordId m_rid;
     private Field [] m_fields;//I put this here
+    
 
     /**
      * Create a new tuple with the specified schema (type).
@@ -26,9 +28,9 @@ public class Tuple implements Serializable {
      */
     public Tuple(TupleDesc td) {
         // some code goes here
-        this.m_td = td;
+        m_td = td;
         m_rid = null;
-        m_fields = new Field[100];
+        m_fields = new Field[m_td.numFields()];        
     }
 
     /**
@@ -55,7 +57,7 @@ public class Tuple implements Serializable {
      *            the new RecordId for this tuple.
      */
     public void setRecordId(RecordId rid) {
-        this.m_rid = rid;
+        m_rid = rid;
     }
 
     /**
@@ -81,6 +83,7 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
+        //return m_fields[i];
         return m_fields[i];
     }
 
@@ -96,7 +99,7 @@ public class Tuple implements Serializable {
         // some code goes here
         String s = "";
         for (int i = 0; i < m_td.numFields(); i++)
-            s += m_td.m_items.elementAt(i).fieldName + "\t";
+            s += m_fields[i] + "\t";
         return s + "\n";
     }
     
@@ -116,6 +119,6 @@ public class Tuple implements Serializable {
     public void resetTupleDesc(TupleDesc td)
     {
         // some code goes here
-        this.m_td = td;
+        m_td = td;
     }
 }
