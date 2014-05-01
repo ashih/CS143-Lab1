@@ -1,5 +1,6 @@
 package simpledb;
 
+import java.io.IOException;
 /**
  * Inserts tuples read from the child operator into the tableid specified in the
  * constructor
