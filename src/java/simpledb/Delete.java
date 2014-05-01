@@ -24,7 +24,6 @@ public class Delete extends Operator {
     private DbIterator m_child;
     private boolean m_deleted;
     private TupleDesc m_td;
-    private DbIterator[] m_children;
 
     public Delete(TransactionId t, DbIterator child) {
         // some code goes here
@@ -75,13 +74,20 @@ public class Delete extends Operator {
         BufferPool pool = Database.getBufferPool();
         
         int count = 0;
-        while (m_child.hasNext()) {
-            Tuple next = m_child.next();
-            count++;
-            pool.deleteTuple(m_tid, next);
+        try{
+            while (m_child.hasNext()) {
+                Tuple next = m_child.next();
+                count++;
+                pool.deleteTuple(m_tid, next);
+            }
+        } catch (IOException e) {
+            System.out.println("Error deleting tuple");
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.exit(1);
         }
-        
-        Tuple result = new Tuple(getTupleDesc());
+
+        Tuple result = new Tuple(m_td);
         IntField intField = new IntField(count);
         result.setField(0, intField);
         m_deleted = true;
@@ -91,13 +97,15 @@ public class Delete extends Operator {
     @Override
     public DbIterator[] getChildren() {
         // some code goes here
-        return m_children;
+        DbIterator[] children = new DbIterator[1];
+        children[1] = m_child;
+        return children;
     }
 
     @Override
     public void setChildren(DbIterator[] children) {
         // some code goes here
-        m_children = children;
+        m_child = children[0];
     }
 
 }

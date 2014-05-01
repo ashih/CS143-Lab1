@@ -97,7 +97,7 @@ public class Insert extends Operator {
             System.exit(1);
         }
         
-        Tuple result = new Tuple(m_tid);
+        Tuple result = new Tuple(m_td);
         IntField intField = new IntField(count);
         result.setField(0, intField);
         m_inserted = true;
@@ -107,7 +107,7 @@ public class Insert extends Operator {
     @Override
     public DbIterator[] getChildren() {
         // some code goes here
-        DbIterator[] = new DbIterator[1];
+        DbIterator[] children = new DbIterator[1];
         children[1] = m_child;
         return children;
     }
@@ -115,6 +115,6 @@ public class Insert extends Operator {
     @Override
     public void setChildren(DbIterator[] children) {
         // some code goes here
-        m_children = children;
+        m_child = children[0];
     }
 }
