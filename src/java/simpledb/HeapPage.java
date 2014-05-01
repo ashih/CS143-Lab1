@@ -340,7 +340,7 @@ public class HeapPage implements Page {
         int bit = i%8;
         byte h = header[slot];
         int mask = value ? h | (1 << bit) : h & ~(1<<bit);
-        header[h] = (byte) mask;
+        header[slot] = (byte) mask;
     }
 
     /**
