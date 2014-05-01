@@ -20,7 +20,7 @@ public class HeapFile implements DbFile {
 
     protected File m_f;
     protected TupleDesc m_td;
-    protected HashMap<Integer,Boolean> m_freeMap;
+    public HashMap<Integer,Boolean> m_freeMap;
 
     /**
      * Constructs a heap file backed by the specified file.
@@ -132,28 +132,27 @@ public class HeapFile implements DbFile {
         HeapPage page;
 
         for (int i = 0; i < numPages(); i++) {
-            if (m_freeMap.containsKey(i) && m_freeMap.get(i))
+            if (m_freeMap.containsKey(i) && m_freeMap.get(i)) {
                 pid = new HeapPageId(getId(),i);
+            }
         }
 
-        if (pid != null) {
-            page = (HeapPage) pool.getPage(tid,pid,Permissions.READ_WRITE);
-        }
-        else {
+        if (pid == null) {
             int tableid = getId();
             pid = new HeapPageId(tableid,numPages());
             byte[] data = HeapPage.createEmptyPageData();
             page = new HeapPage((HeapPageId) pid,data);
-            writePage(page);
+            writePage(page);            
         }
-        int pageNumber = page.getId().pageNumber();
+        page = (HeapPage) pool.getPage(tid,pid,Permissions.READ_WRITE);            
+        int pageNumber = page.getId().pageNumber();    
         page.insertTuple(t);
         page.markDirty(true,tid);
         m_freeMap.put(pageNumber, ((HeapPage)page).getNumEmptySlots() > 0);
         pages.add(page);
         return pages;
-    
-}
+    }
+
     // see DbFile.java for javadocs
     public ArrayList<Page> deleteTuple(TransactionId tid, Tuple t) throws DbException,
             TransactionAbortedException {
