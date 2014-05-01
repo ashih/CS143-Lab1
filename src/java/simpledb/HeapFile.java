@@ -20,7 +20,7 @@ public class HeapFile implements DbFile {
 
     protected File m_f;
     protected TupleDesc m_td;
-    protected boolean m_freeMap[];
+    protected HashMap<Integer,Boolean> m_freeMap;
 
     /**
      * Constructs a heap file backed by the specified file.
@@ -33,9 +33,7 @@ public class HeapFile implements DbFile {
         // some code goes here
         m_f = f;
         m_td = td;
-        m_freeMap = new boolean[numPages()];
-        for (int i = 0; i < numPages(); i++)
-            m_freeMap[i] = false;
+        m_freeMap = new HashMap<Integer,Boolean>();
 
     }
 
@@ -88,7 +86,6 @@ public class HeapFile implements DbFile {
             raf.close();
             HeapPageId hpid = (HeapPageId) pid;
             HeapPage hp = new HeapPage(hpid, buffer);
-            m_freeMap[hp.getId().pageNumber()] = ((HeapPage)hp).getNumEmptySlots() > 0;
             return hp;
         } catch (IOException e) {
             System.err.println("IO error when reading page");
@@ -104,9 +101,9 @@ public class HeapFile implements DbFile {
         try { 
             RandomAccessFile raf = new RandomAccessFile(m_f,"rw");
             byte[] buffer = buffer = page.getPageData();
+            int pageNumber = page.getId().pageNumber();
             int offset = BufferPool.PAGE_SIZE * page.getId().pageNumber();
-
-            m_freeMap[page.getId().pageNumber()] = ((HeapPage)page).getNumEmptySlots() > 0;
+            m_freeMap.put(pageNumber, ((HeapPage)page).getNumEmptySlots() > 0);
             raf.seek(offset);
             raf.write(buffer, 0, BufferPool.PAGE_SIZE);
             raf.close();
@@ -121,32 +118,56 @@ public class HeapFile implements DbFile {
      */
     public int numPages() {
         // some code goes here
-        return (int) Math.ceil( (double) (m_f.length()/BufferPool.PAGE_SIZE));
+        return (int) Math.ceil( ((double) (m_f.length())/BufferPool.PAGE_SIZE));
     }
 
     // see DbFile.java for javadocs
     public ArrayList<Page> insertTuple(TransactionId tid, Tuple t)
             throws DbException, IOException, TransactionAbortedException {
-        // some code goes here
-
-        ArrayList<Page> pages = new ArrayList<Page>();
-        return null;
+        // some code goes here        
         // not necessary for lab1
-    }
+        ArrayList<Page> pages = new ArrayList<Page>();
+        BufferPool pool = Database.getBufferPool();
+        PageId pid = null;
+        HeapPage page;
 
+        for (int i = 0; i < numPages(); i++) {
+            if (m_freeMap.containsKey(i) && m_freeMap.get(i))
+                pid = new HeapPageId(getId(),i);
+        }
+
+        if (pid != null) {
+            page = (HeapPage) pool.getPage(tid,pid,Permissions.READ_WRITE);
+        }
+        else {
+            int tableid = getId();
+            pid = new HeapPageId(tableid,numPages());
+            byte[] data = HeapPage.createEmptyPageData();
+            page = new HeapPage((HeapPageId) pid,data);
+            writePage(page);
+        }
+        int pageNumber = page.getId().pageNumber();
+        page.insertTuple(t);
+        page.markDirty(true,tid);
+        m_freeMap.put(pageNumber, ((HeapPage)page).getNumEmptySlots() > 0);
+        pages.add(page);
+        return pages;
+    
+}
     // see DbFile.java for javadocs
     public ArrayList<Page> deleteTuple(TransactionId tid, Tuple t) throws DbException,
             TransactionAbortedException {
-        // some code goes here
+        // some code goes here        
+        // not necessary for lab1
         ArrayList<Page> pages = new ArrayList<Page>();
         BufferPool pool = Database.getBufferPool();
         PageId pid = t.getRecordId().getPageId();
         HeapPage page = (HeapPage) pool.getPage(tid,pid,Permissions.READ_WRITE);
         page.deleteTuple(t);
+        m_freeMap.put(page.getId().pageNumber(),true);
         page.markDirty(true,tid);
         pages.add(page);
         return pages;
-        // not necessary for lab1
     }
 
     // see DbFile.java for javadocs
