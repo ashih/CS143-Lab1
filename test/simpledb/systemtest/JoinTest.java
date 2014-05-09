@@ -47,9 +47,23 @@ public class JoinTest extends SimpleDbTestBase {
         JoinPredicate p = new JoinPredicate(0, Predicate.Op.EQUALS, 0);
         Join joinOp = new Join(p, ss1, ss2);
 
+
+        /*// my test code
+        joinOp.open();
+        Tuple nxt;
+        while (joinOp.hasNext()) {
+            nxt = joinOp.next();
+            System.out.println(nxt);
+        }
+        for (ArrayList<Integer> t : expectedResults) {
+            System.out.println(t);
+        }
+        joinOp.rewind();
+        // my test code (fix join) */
+
         // test the join results
         SystemTestUtil.matchTuples(joinOp, expectedResults);
-
+        
         joinOp.close();
         Database.getBufferPool().transactionComplete(tid);
     }

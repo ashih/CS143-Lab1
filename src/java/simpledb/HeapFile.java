@@ -20,7 +20,7 @@ public class HeapFile implements DbFile {
 
     protected File m_f;
     protected TupleDesc m_td;
-    public HashMap<Integer,Boolean> m_freeMap;
+    protected HashMap<Integer,Boolean> m_freeMap;
 
     /**
      * Constructs a heap file backed by the specified file.

@@ -3,6 +3,7 @@ package simpledb;
 import java.io.*;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedList;
 
 /**
  * BufferPool manages the reading and writing of pages into memory from
@@ -19,7 +20,7 @@ public class BufferPool {
     /** Bytes per page, including header. */
     public static final int PAGE_SIZE = 4096;
 
-    private static int pageSize = PAGE_SIZE;
+    private static int m_pageSize = PAGE_SIZE;
     
     /** Default number of pages passed to the constructor. This is used by
     other classes. BufferPool should use the numPages argument to the
@@ -28,8 +29,10 @@ public class BufferPool {
     
     
     
-    private ConcurrentHashMap<Integer,Page> pages;
-    private int maxpages;
+    private ConcurrentHashMap<Integer,Page> m_pages;
+    private int m_maxpages;
+    private LinkedList<Integer> m_lru;
+
     /**
      * Creates a BufferPool that caches up to numPages pages.
      *
@@ -37,17 +40,18 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         // some code goes here
-        pages = new ConcurrentHashMap<Integer,Page>();
-        maxpages = numPages;
+        m_pages = new ConcurrentHashMap<Integer,Page>();
+        m_maxpages = numPages;
+        m_lru = new LinkedList<Integer>();
     }
     
     public static int getPageSize() {
-        return pageSize;
+        return m_pageSize;
     }
     
     // THIS FUNCTION SHOULD ONLY BE USED FOR TESTING!!
     public static void setPageSize(int pageSize) {
-    	BufferPool.pageSize = pageSize;
+    	BufferPool.m_pageSize = pageSize;
     }
 
     /**
@@ -69,12 +73,16 @@ public class BufferPool {
         throws TransactionAbortedException, DbException {
         // some code goes here
         int key = pid.hashCode();
-        if (pages.containsKey(key))
-            return pages.get(key);
-        if (pages.size() == maxpages)
+        if (m_pages.containsKey(key)) {
+            m_lru.remove((Object) key);
+            m_lru.add(key);
+            return m_pages.get(key);
+        }
+        if (m_pages.size() == m_maxpages)
             evictPage();
         Page p = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
-        pages.put(pid.hashCode(), p);
+        m_pages.put(pid.hashCode(), p);
+        m_lru.add(key);
         return p;
     }
 
@@ -170,6 +178,7 @@ public class BufferPool {
     public synchronized void flushAllPages() throws IOException {
         // some code goes here
         // not necessary for lab1
+        //if (p.dirty != null)
 
     }
 
@@ -190,6 +199,9 @@ public class BufferPool {
     private synchronized  void flushPage(PageId pid) throws IOException {
         // some code goes here
         // not necessary for lab1
+        HeapFile hf = (HeapFile) Database.getCatalog().getDatabaseFile(pid.getTableId());
+        Page p = m_pages.get(pid.hashCode());        
+        hf.writePage(p);
     }
 
     /** Write all pages of the specified transaction to disk.
@@ -206,6 +218,16 @@ public class BufferPool {
     private synchronized  void evictPage() throws DbException {
         // some code goes here
         // not necessary for lab1
+        int key = m_lru.poll();
+        HeapPage p = (HeapPage) m_pages.get(key);
+        try {
+            if (p.isDirty() == null) {            
+                flushPage(p.getId());
+            }
+            m_pages.remove(key);
+        } catch (IOException e){
+            System.out.println("IOException!!");
+        }
     }
 
 }

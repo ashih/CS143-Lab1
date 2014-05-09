@@ -54,14 +54,20 @@ public class IntegerAggregator implements Aggregator {
      *            the Tuple containing an aggregate field and a group-by field
      */
     public void mergeTupleIntoGroup(Tuple tup) {
-        // some code goes here 
-        if (m_keyName == null)
-            m_keyName = tup.getTupleDesc().getFieldName(m_gbfield);
+        // some code goes here
         Object key;
-        if (tup.getField(m_gbfield).getType() == Type.INT_TYPE)
-            key = ((IntField) tup.getField(m_gbfield)).getValue();
-        else 
-            key = ((StringField) tup.getField(m_gbfield)).getValue();
+        if (m_gbfield == NO_GROUPING) {
+            key = (Integer) NO_GROUPING;
+        }
+        else {
+            if (m_keyName == null)
+                m_keyName = tup.getTupleDesc().getFieldName(m_gbfield);
+            
+            if (tup.getField(m_gbfield).getType() == Type.INT_TYPE)
+                key = ((IntField) tup.getField(m_gbfield)).getValue();
+            else 
+                key = ((StringField) tup.getField(m_gbfield)).getValue();
+        }
         int value = ((IntField) tup.getField(m_afield)).getValue();
         int aggregate;
         int count;
@@ -148,6 +154,9 @@ public class IntegerAggregator implements Aggregator {
             int value = entry.getValue();
             if (m_what == Aggregator.Op.AVG) {
                 value = value / m_count.get(key);
+            }
+            else if (m_what == Aggregator.Op.COUNT) {
+                value = m_count.get(key);
             }
 
             Field aggregatefield = new IntField(value);            

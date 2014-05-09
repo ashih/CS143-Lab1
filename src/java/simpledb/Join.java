@@ -25,6 +25,7 @@ public class Join extends Operator {
     DbIterator m_child1, m_child2;
     Tuple m_next1;
     Boolean m_getNext1;
+    Boolean m_stop1;
 
     public Join(JoinPredicate p, DbIterator child1, DbIterator child2) {
         // some code goes here
@@ -33,6 +34,7 @@ public class Join extends Operator {
         m_child2 = child2;
         m_next1 = null;
         m_getNext1 = false;
+        m_stop1 = false;
     }
 
     public JoinPredicate getJoinPredicate() {
@@ -88,6 +90,9 @@ public class Join extends Operator {
         // some code goes here
         m_child1.rewind();
         m_child2.rewind();
+        m_next1 = null;
+        m_getNext1 = false;
+        m_stop1 = false;
     }
 
     /**
@@ -110,7 +115,8 @@ public class Join extends Operator {
      */
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
         // some code goes here
-        while(m_child1.hasNext()) {
+        //while(m_child1.hasNext()) {
+        while(!m_stop1) {
             Tuple next1;
             if (m_next1 == null) {
                 next1 = m_child1.next();
@@ -118,7 +124,13 @@ public class Join extends Operator {
             }
             else {
                 if (m_getNext1) {
-                    next1 = m_child1.next();
+                    if (m_child1.hasNext()) {
+                        next1 = m_child1.next();
+                    }
+                    else {
+                        m_stop1 = true;
+                        break;
+                    }
                     m_next1 = next1;
                     m_getNext1 = false;
                 }

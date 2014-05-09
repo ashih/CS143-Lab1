@@ -53,11 +53,13 @@ public class Insert extends Operator {
         // some code goes here
         m_child.open();
         m_inserted = false;
+        super.open();
     }
 
     public void close() {
         // some code goes here
         m_child.close();
+        super.close();
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
@@ -109,7 +111,7 @@ public class Insert extends Operator {
     public DbIterator[] getChildren() {
         // some code goes here
         DbIterator[] children = new DbIterator[1];
-        children[1] = m_child;
+        children[0] = m_child;
         return children;
     }
 
