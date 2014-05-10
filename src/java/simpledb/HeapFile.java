@@ -100,7 +100,7 @@ public class HeapFile implements DbFile {
         // not necessary for lab1
         try { 
             RandomAccessFile raf = new RandomAccessFile(m_f,"rw");
-            byte[] buffer = buffer = page.getPageData();
+            byte[] buffer = page.getPageData();
             int pageNumber = page.getId().pageNumber();
             int offset = BufferPool.PAGE_SIZE * page.getId().pageNumber();
             m_freeMap.put(pageNumber, ((HeapPage)page).getNumEmptySlots() > 0);
