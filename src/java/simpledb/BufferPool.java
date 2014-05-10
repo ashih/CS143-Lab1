@@ -4,6 +4,7 @@ import java.io.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * BufferPool manages the reading and writing of pages into memory from
@@ -178,7 +179,12 @@ public class BufferPool {
     public synchronized void flushAllPages() throws IOException {
         // some code goes here
         // not necessary for lab1
-        //if (p.dirty != null)
+        for (Map.Entry<Integer, Page> e : m_pages.entrySet()) {
+            Page p = e.getValue();
+            if (p.isDirty() != null) {
+                flushPage(p.getId());
+            }
+        }
 
     }
 
