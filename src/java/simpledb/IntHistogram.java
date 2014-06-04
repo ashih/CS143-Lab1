@@ -60,9 +60,40 @@ public class IntHistogram {
      * @param v Value
      * @return Predicted selectivity of this particular operator and value
      */
-    public double estimateSelectivity(Predicate.Op op, int v) {
+    private int greaterThan (int b)
+    {
+        int sum = 0;
+        for (int i = b + 1; i < m_numbuckets; i++)
+            sum += m_buckets[i];
+        return sum;
+    }
 
+    public double estimateSelectivity(Predicate.Op op, int v) {
     	// some code goes here
+        int b = 0;
+        if (v <= m_max && v >= m_min)
+            b = (v-m_min)/m_bucketsize;
+        double numberOfValues = m_buckets[b]; //valuesInBucket
+        double sumOfValues = 0; //totalValues
+        for (int i = 0; i < m_numbuckets; i++)
+            sumOfValues += m_buckets[i];
+        switch (op) {
+            case EQUALS:
+                return numberOfValues/sumOfValues;
+            case GREATER_THAN:
+                return greaterThan(b)/sumOfValues;
+            case GREATER_THAN_OR_EQ:
+                double temp = greaterThan(b) + numberOfValues;
+                return temp/sumOfValues;
+            case LESS_THAN_OR_EQ:
+                return (sumOfValues - greaterThan(b)) / sumOfValues;
+            case LESS_THAN:
+                return (sumOfValues - greaterThan(b) - numberOfValues);
+            case NOT_EQUALS:
+                return (sumOfValues - numberOfValues) / sumOfValues;
+            default:
+                break;
+        }
         return -1.0;
     }
     
