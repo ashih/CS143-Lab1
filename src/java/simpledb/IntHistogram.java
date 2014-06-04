@@ -4,6 +4,12 @@ package simpledb;
  */
 public class IntHistogram {
 
+
+    private int m_numbuckets;
+    private int m_min;
+    private int m_max;
+    private int[] m_buckets;
+    private int m_bucketsize;
     /**
      * Create a new IntHistogram.
      * 
@@ -22,6 +28,13 @@ public class IntHistogram {
      */
     public IntHistogram(int buckets, int min, int max) {
     	// some code goes here
+        m_numbuckets = buckets;
+        m_min = min;
+        m_max = max;
+        m_bucketsize = (int) Math.ceil((max-min)/buckets);
+        m_buckets = new int[buckets];
+        for (int i = 0; i < m_numbuckets; i++)
+            m_buckets[i] = 0;
     }
 
     /**
@@ -30,6 +43,11 @@ public class IntHistogram {
      */
     public void addValue(int v) {
     	// some code goes here
+        if (v <= m_max && v >= m_min)
+        {
+            int b = (v-m_min)/m_bucketsize;
+            m_buckets[b]++;
+        }
     }
 
     /**
