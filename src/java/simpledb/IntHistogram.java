@@ -98,7 +98,7 @@ public class IntHistogram {
         double numberOfValues = 0;
         if (b != UNDER && b != OVER) 
             numberOfValues = m_buckets[b]; 
-        double tValues = allValues(); 
+        double tValues = allValues();
         switch (op) {
             case EQUALS:
                 return numberOfValues/tValues;
