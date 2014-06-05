@@ -82,7 +82,7 @@ public class IntHistogram {
         return sumOfValues;
     }
 
-    private int greaterThan (int b)
+    private int gt (int b)
     {
         if (b == OVER) return 0;
         if (b == UNDER) return allValues();
@@ -97,20 +97,20 @@ public class IntHistogram {
         int b = getIndex(v);
         double numberOfValues = 0;
         if (b != UNDER && b != OVER) 
-            numberOfValues = m_buckets[b]; //valuesInBucket
-        double tValues = allValues(); //totalValues
+            numberOfValues = m_buckets[b]; 
+        double tValues = allValues(); 
         switch (op) {
             case EQUALS:
                 return numberOfValues/tValues;
             case GREATER_THAN:
-                return greaterThan(b)/tValues;
+                return gt(b)/tValues;
             case GREATER_THAN_OR_EQ:
-                double temp = greaterThan(b) + numberOfValues;
+                double temp = gt(b) + numberOfValues;
                 return temp/tValues;
             case LESS_THAN_OR_EQ:
-                return (tValues - greaterThan(b)) / tValues;
+                return (tValues - gt(b)) / tValues;
             case LESS_THAN:
-                return (tValues - greaterThan(b) - numberOfValues)/tValues;
+                return (tValues - gt(b) - numberOfValues)/tValues;
             case NOT_EQUALS:
                 return (tValues - numberOfValues) / tValues;
             default:
