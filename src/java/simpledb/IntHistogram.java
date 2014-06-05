@@ -10,6 +10,9 @@ public class IntHistogram {
     private int m_max;
     private int[] m_buckets;
     private int m_bucketsize;
+    private int m_range;
+    private int OVER = -1;
+    private int UNDER = -2;
     /**
      * Create a new IntHistogram.
      * 
@@ -31,7 +34,11 @@ public class IntHistogram {
         m_numbuckets = buckets;
         m_min = min;
         m_max = max;
-        m_bucketsize = (int) Math.ceil((max-min)/buckets);
+        m_range = max-min;
+        if (m_numbuckets > m_range)
+            m_bucketsize = 1;
+        else
+            m_bucketsize = (int) Math.ceil(m_range/buckets);
         m_buckets = new int[buckets];
         for (int i = 0; i < m_numbuckets; i++)
             m_buckets[i] = 0;
@@ -43,11 +50,10 @@ public class IntHistogram {
      */
     public void addValue(int v) {
     	// some code goes here
-        if (v <= m_max && v >= m_min)
-        {
-            int b = (v-m_min)/m_bucketsize;
-            m_buckets[b]++;
-        }
+        assert (v >= m_min);
+        assert (v <= m_max);
+        int b = getIndex(v);
+        m_buckets[b]++;
     }
 
     /**
@@ -60,8 +66,26 @@ public class IntHistogram {
      * @param v Value
      * @return Predicted selectivity of this particular operator and value
      */
+    private int getIndex (int val)
+    {
+        if (val < m_min) return UNDER;
+        if (val > m_max) return OVER;
+        if ((val == m_max) && (val % m_bucketsize == 0)) val--;
+        return (val-m_min)/m_bucketsize;
+    }
+
+    private int allValues()
+    {
+        int sumOfValues = 0; //totalValues
+        for (int i = 0; i < m_numbuckets; i++)
+            sumOfValues += m_buckets[i];
+        return sumOfValues;
+    }
+
     private int greaterThan (int b)
     {
+        if (b == OVER) return 0;
+        if (b == UNDER) return allValues();
         int sum = 0;
         for (int i = b + 1; i < m_numbuckets; i++)
             sum += m_buckets[i];
@@ -70,31 +94,29 @@ public class IntHistogram {
 
     public double estimateSelectivity(Predicate.Op op, int v) {
     	// some code goes here
-        int b = 0;
-        if (v <= m_max && v >= m_min)
-            b = (v-m_min)/m_bucketsize;
-        double numberOfValues = m_buckets[b]; //valuesInBucket
-        double sumOfValues = 0; //totalValues
-        for (int i = 0; i < m_numbuckets; i++)
-            sumOfValues += m_buckets[i];
+        int b = getIndex(v);
+        double numberOfValues = 0;
+        if (b != UNDER && b != OVER) 
+            numberOfValues = m_buckets[b]; //valuesInBucket
+        double tValues = allValues(); //totalValues
         switch (op) {
             case EQUALS:
-                return numberOfValues/sumOfValues;
+                return numberOfValues/tValues;
             case GREATER_THAN:
-                return greaterThan(b)/sumOfValues;
+                return greaterThan(b)/tValues;
             case GREATER_THAN_OR_EQ:
                 double temp = greaterThan(b) + numberOfValues;
-                return temp/sumOfValues;
+                return temp/tValues;
             case LESS_THAN_OR_EQ:
-                return (sumOfValues - greaterThan(b)) / sumOfValues;
+                return (tValues - greaterThan(b)) / tValues;
             case LESS_THAN:
-                return (sumOfValues - greaterThan(b) - numberOfValues);
+                return (tValues - greaterThan(b) - numberOfValues)/tValues;
             case NOT_EQUALS:
-                return (sumOfValues - numberOfValues) / sumOfValues;
+                return (tValues - numberOfValues) / tValues;
             default:
                 break;
         }
-        return -1.0;
+        return 1;
     }
     
     /**
