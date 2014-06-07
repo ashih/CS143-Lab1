@@ -111,7 +111,11 @@ public class JoinOptimizer {
             // HINT: You may need to use the variable "j" if you implemented
             // a join algorithm that's more complicated than a basic nested-loops
             // join.
-            
+
+            //joincost(t1 join t2) = 
+            //scancost(t1) + ntups(t1) x scancost(t2) //IO cost
+            //+ ntups(t1) x ntups(t2)  //CPU cost
+            return cost1 + (card1*cost2) + (card1*card2);
         }
     }
 
@@ -141,10 +145,26 @@ public class JoinOptimizer {
             // You do not need to implement proper support for these for Project 3.
             return card1;
         } else {
-            return estimateTableJoinCardinality(j.p, j.t1Alias, j.t2Alias,
-                    j.f1PureName, j.f2PureName, card1, card2, t1pkey, t2pkey,
-                    stats, p.getTableAliasToIdMapping());
+            switch (j.p) 
+            {
+                case EQUALS:
+                case NOT_EQUALS:
+                {
+                    if (t1pkey) return card2;
+                    if (t2pkey) return card1;
+                    return card1 > card2 ? card1 : card2;
+                }
+                case GREATER_THAN:
+                case GREATER_THAN_OR_EQ:
+                case LESS_THAN:
+                case LESS_THAN_OR_EQ:
+                case LIKE:
+                {
+                    return (int)((card1 * card2) * 0.3);
+                }
+            }
         }
+        return 0;
     }
     /**
      * Estimate the join cardinality of two tables.
