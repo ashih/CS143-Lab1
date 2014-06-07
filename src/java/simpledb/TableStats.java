@@ -76,6 +76,11 @@ public class TableStats {
      *            The cost per page of IO. This doesn't differentiate between
      *            sequential-scan IO and disk seeks.
      */
+    private int m_tableid;
+    private int m_cost;
+    private HeapFile m_tablefile;
+    private int m_ntuples;
+
     public TableStats(int tableid, int ioCostPerPage) {
         // For this function, you'll have to get the
         // DbFile for the table in question,
@@ -85,6 +90,24 @@ public class TableStats {
         // necessarily have to (for example) do everything
         // in a single scan of the table.
         // some code goes here
+        m_tableid = tableid;
+        m_cost = ioCostPerPage;
+        m_tablefile = (HeapFile) Database.getCatalog().getDatabaseFile(tableid);
+
+
+        //Create Iterator
+        Transaction t = new Transaction();
+        DbFileIterator iter = m_tablefile.iterator(t);
+        try {
+            iter.open();
+        } catch (DbException e) {
+            e.printStackTrace();
+        } catch (TransactionAbortedException e) {
+            e.printStackTrace();
+        }
+
+        //get first tuple
+        
     }
 
     /**
@@ -101,7 +124,7 @@ public class TableStats {
      */
     public double estimateScanCost() {
         // some code goes here
-        return 0;
+        return m_tfile.numPages() * m_cost;
     }
 
     /**
