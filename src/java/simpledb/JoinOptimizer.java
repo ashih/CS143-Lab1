@@ -145,26 +145,10 @@ public class JoinOptimizer {
             // You do not need to implement proper support for these for Project 3.
             return card1;
         } else {
-            switch (j.p) 
-            {
-                case EQUALS:
-                case NOT_EQUALS:
-                {
-                    if (t1pkey) return card2;
-                    if (t2pkey) return card1;
-                    return card1 > card2 ? card1 : card2;
-                }
-                case GREATER_THAN:
-                case GREATER_THAN_OR_EQ:
-                case LESS_THAN:
-                case LESS_THAN_OR_EQ:
-                case LIKE:
-                {
-                    return (int)((card1 * card2) * 0.3);
-                }
-            }
+            return estimateTableJoinCardinality(j.p, j.t1Alias, j.t2Alias,
+                    j.f1PureName, j.f2PureName, card1, card2, t1pkey, t2pkey,
+                    stats, p.getTableAliasToIdMapping());
         }
-        return 0;
     }
     /**
      * Estimate the join cardinality of two tables.
@@ -176,7 +160,20 @@ public class JoinOptimizer {
             Map<String, Integer> tableAliasToId) {
         int card = 1;
         // some code goes here
-        return card <= 0 ? 1 : card;
+        switch (joinOp) 
+        {
+            case EQUALS:
+            case NOT_EQUALS:
+            {
+                if (t1pkey) return card2;
+                if (t2pkey) return card1;
+                return card1 > card2 ? card1 : card2;
+            }
+            default:
+            {
+                return (int)((card1 * card2) * 0.3);
+            }
+        }
     }
 
     /**
@@ -242,6 +239,7 @@ public class JoinOptimizer {
 
         // some code goes here
         //Replace the following
+
         return joins;
     }
 
