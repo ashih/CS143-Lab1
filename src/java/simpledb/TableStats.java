@@ -147,9 +147,9 @@ public class TableStats {
 
             //creating histograms
 
-            for(int i = 0; i < nfields; i++)
+            for (int i = 0; i < nfields; i++)
             {
-                if(m_td.getFieldType(i) == Type.INT_TYPE)
+                if (m_td.getFieldType(i) == Type.INT_TYPE)
                 {
                     String fieldname = m_td.getFieldName(i);
                     intmap.put(fieldname, new IntHistogram(NUM_HIST_BINS, minmap.get(fieldname), maxmap.get(fieldname)));
@@ -163,19 +163,15 @@ public class TableStats {
             iter.rewind();
 
             //try again
-            while(iter.hasNext())
+            while (iter.hasNext())
             {
                 Tuple tup = iter.next();
-                for(int i = 0; i < nfields; i++)
+                for (int i = 0; i < nfields; i++)
                 {
-                    if(m_td.getFieldType(i) == Type.INT_TYPE)
-                    {
+                    if (m_td.getFieldType(i) == Type.INT_TYPE)
                         intmap.get(m_td.getFieldName(i)).addValue(((IntField)(tup.getField(i))).getValue());
-                    }
                     else if (m_td.getFieldType(i) == Type.STRING_TYPE)
-                    {
                         strmap.get(m_td.getFieldName(i)).addValue(((StringField)(tup.getField(i))).getValue());
-                    }
                 }
             }
         } catch (DbException e) {
