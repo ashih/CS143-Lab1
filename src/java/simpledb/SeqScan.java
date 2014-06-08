@@ -107,7 +107,7 @@ public class SeqScan implements DbIterator {
         for (int i = 0; i < len; i++)
         {
             types[i] = temp.getFieldType(i);
-            names[i] = m_tableAlias + "," + temp.getFieldName(i);
+            names[i] = m_tableAlias + "." + temp.getFieldName(i);
         }
         return new TupleDesc(types,names);
     }

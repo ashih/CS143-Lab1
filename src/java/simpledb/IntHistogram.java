@@ -38,7 +38,7 @@ public class IntHistogram {
         if (m_numbuckets > m_range)
             m_bucketsize = 1;
         else
-            m_bucketsize = (int) Math.ceil(m_range/buckets);
+            m_bucketsize = (int) Math.ceil( (double) m_range / (double) buckets);
         m_buckets = new int[buckets];
         for (int i = 0; i < m_numbuckets; i++)
             m_buckets[i] = 0;

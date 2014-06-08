@@ -24,8 +24,8 @@ public class Join extends Operator {
     JoinPredicate m_p;
     DbIterator m_child1, m_child2;
     Tuple m_next1;
-    Boolean m_getNext1;
-    Boolean m_stop1;
+    //Boolean m_getNext1;
+    //Boolean m_stop1;
 
     public Join(JoinPredicate p, DbIterator child1, DbIterator child2) {
         // some code goes here
@@ -33,8 +33,8 @@ public class Join extends Operator {
         m_child1 = child1;
         m_child2 = child2;
         m_next1 = null;
-        m_getNext1 = false;
-        m_stop1 = false;
+        //m_getNext1 = false;
+        //m_stop1 = false;
     }
 
     public JoinPredicate getJoinPredicate() {
@@ -91,8 +91,8 @@ public class Join extends Operator {
         m_child1.rewind();
         m_child2.rewind();
         m_next1 = null;
-        m_getNext1 = false;
-        m_stop1 = false;
+        //m_getNext1 = false;
+        //m_stop1 = false;
     }
 
     /**
@@ -116,7 +116,8 @@ public class Join extends Operator {
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
         // some code goes here
         //while(m_child1.hasNext()) {
-        while(!m_stop1) {
+
+        /*while(!m_stop1) {
             Tuple next1;
             if (m_next1 == null) {
                 next1 = m_child1.next();
@@ -159,6 +160,42 @@ public class Join extends Operator {
             m_getNext1 = true;
         }
 
+        return null;*/
+
+        Tuple next1 = m_next1;
+        if (next1 == null && m_child1.hasNext()) {
+
+            next1 = m_child1.next();
+            m_child2.rewind();
+
+        }
+
+        while ((m_child1.hasNext() || m_child2.hasNext()) && next1 != null) {
+            while(m_child2.hasNext()) {
+                Tuple next2 = m_child2.next();
+                if (m_p.filter(next1,next2)) {
+                    m_next1 = next1;
+                    Tuple join = new Tuple(getTupleDesc());
+                    int size1 = m_child1.getTupleDesc().numFields();
+                    int size2 = m_child2.getTupleDesc().numFields();
+                    for (int i = 0; i < size1; i++) {
+                        join.setField(i,next1.getField(i));
+                    }
+                    for (int j = 0; j < size2; j++) {
+                        join.setField(size1 + j,next2.getField(j));       
+                    }
+                    return join;
+                }
+            }
+
+            if (m_child1.hasNext()) {
+                m_child2.rewind();
+                next1 = m_child1.next();
+            }
+
+
+        }
+        m_next1 = null;
         return null;
     }
 
@@ -167,7 +204,7 @@ public class Join extends Operator {
         // some code goes here
         DbIterator[] children = new DbIterator[2];
         children[0] = m_child1;
-        children[0] = m_child2;
+        children[1] = m_child2;
         return children;
     }
 

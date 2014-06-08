@@ -6,7 +6,6 @@ import java.util.Iterator;
 import simpledb.TupleDesc.TDItem;
 
 public class QueryPlanVisualizer {
-
     static final String JOIN = "⨝";
     static final String HASH_JOIN = "⨝(hash)";
     static final String SELECT = "σ";

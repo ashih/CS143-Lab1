@@ -533,9 +533,9 @@ public class Parser {
                                         + s
                                         + "\n -- parser only handles SQL transactions, insert, delete, and select statements");
                     }
-                    if (query != null)
+                    if (query != null) {
                         query.execute();
-
+                    }
                     if (!inUserTrans && curtrans != null) {
                         curtrans.commit();
                         System.out.println("Transaction "
@@ -556,6 +556,7 @@ public class Parser {
                         throw new ParsingException((Exception) a);
                     if (a instanceof Zql.TokenMgrError)
                         throw (Zql.TokenMgrError) a;
+                    System.out.println(a.getClass());
                     throw new DbException(a.getMessage());
                 } finally {
                     if (!inUserTrans)
