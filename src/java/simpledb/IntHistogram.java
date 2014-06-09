@@ -53,6 +53,13 @@ public class IntHistogram {
         assert (v >= m_min);
         assert (v <= m_max);
         int b = getIndex(v);
+        /*if (b >= m_numbuckets) {
+            System.out.println(b);
+            System.out.println(v);
+            //System.out.println(m_min);
+            //System.out.println(m_max);
+            //System.out.println(m_bucketsize);
+        }*/
         m_buckets[b]++;
     }
 
@@ -70,7 +77,7 @@ public class IntHistogram {
     {
         if (val < m_min) return UNDER;
         if (val > m_max) return OVER;
-        if ((val == m_max) && (val % m_bucketsize == 0)) val--;
+        if ((val == m_max) && (val % m_bucketsize == 0)) val--;        
         return (val-m_min)/m_bucketsize;
     }
 

@@ -278,12 +278,12 @@ public class Parser {
             simpledb.ParsingException, Zql.ParseException {
         // and run it
         Query query = new Query(tId);
-
         LogicalPlan lp = parseQueryLogicalPlan(tId, s);
         DbIterator physicalPlan = lp.physicalPlan(tId,
                 TableStats.getStatsMap(), explain);
         query.setPhysicalPlan(physicalPlan);
         query.setLogicalPlan(lp);
+
 
         if (physicalPlan != null) {
             Class<?> c;
@@ -524,9 +524,9 @@ public class Parser {
                     else if (s instanceof ZDelete)
                         query = handleDeleteStatement((ZDelete) s,
                                 curtrans.getId());
-                    else if (s instanceof ZQuery)
+                    else if (s instanceof ZQuery) 
                         query = handleQueryStatement((ZQuery) s,
-                                curtrans.getId());
+                                curtrans.getId());                    
                     else {
                         System.out
                                 .println("Can't parse "

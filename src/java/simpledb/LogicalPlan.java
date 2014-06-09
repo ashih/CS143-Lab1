@@ -305,7 +305,7 @@ public class LogicalPlan {
             filterSelectivities.put(table.alias, 1.0);
 
         }
-
+        
         Iterator<LogicalFilterNode> filterIt = filters.iterator();        
         while (filterIt.hasNext()) {
             LogicalFilterNode lf = filterIt.next();
@@ -343,19 +343,16 @@ public class LogicalPlan {
 
             //s.addSelectivityFactor(estimateFilterSelectivity(lf,statsMap));
         }
-        
         JoinOptimizer jo = new JoinOptimizer(this,joins);
-
         joins = jo.orderJoins(statsMap,filterSelectivities,explain);
-
         Iterator<LogicalJoinNode> joinIt = joins.iterator();
+        System.out.println(joins);
         while (joinIt.hasNext()) {
             LogicalJoinNode lj = joinIt.next();
             DbIterator plan1;
             DbIterator plan2;
             boolean isSubqueryJoin = lj instanceof LogicalSubplanJoinNode;
             String t1name, t2name;
-
             if (equivMap.get(lj.t1Alias)!=null)
                 t1name = equivMap.get(lj.t1Alias);
             else
@@ -401,6 +398,7 @@ public class LogicalPlan {
             }
             
         }
+
 
         if (subplanMap.size() > 1) {
             throw new ParsingException("Query does not include join expressions joining all nodes!");

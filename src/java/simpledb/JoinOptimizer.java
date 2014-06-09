@@ -261,8 +261,14 @@ public class JoinOptimizer {
         }
         if (explain) {
             printJoins(joins, pc, stats, filterSelectivities);
-        }        
-        return pc.getOrder(joinSet);
+        }
+
+        Vector<LogicalJoinNode> result = pc.getOrder(joinSet);
+        if (result == null)
+            return new Vector<LogicalJoinNode>();
+            //return null;
+        else
+            return result;
     }
 
     // ===================== Private Methods =================================
